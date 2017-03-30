@@ -1,1 +1,1 @@
-char **tokenize (char*);
+char** tokenize (char*);
