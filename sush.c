@@ -40,9 +40,14 @@ void unsetEnv() {
 
 /**
  * Change directory to given directory.
+ * @author Evan
+ * TODO Handle chdir error codes.
  */
-void cd() {
-
+void cd(char* newPath) {
+   char* wd;
+   wd = getcwd(wd, 1023);
+   wd = strcat(wd, newPath);
+   chdir(wd);
 }
 
 /**
