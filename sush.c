@@ -150,7 +150,7 @@ void init() {
 	if (sushrc != NULL) {
 	   // Run all commands found in .sushrc
 	   char* command = malloc(COMMAND_BUFFER * sizeof(char));
-	   while (fgets(command, COMMAND_BUFFER, sushrc));
+	   while (fgets(command, COMMAND_BUFFER, sushrc))
 	   	readAndExecute(command);
 	   // free memory
 	   free(command);		
