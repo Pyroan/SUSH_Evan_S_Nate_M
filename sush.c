@@ -11,10 +11,12 @@
 
 // Environment Variables
 // We may have to change these to a Dictionary data structure
+// Or some other kind of data structure. Some kind of associative array.
 // http://stackoverflow.com/questions/4384359/quick-way-to-implement-dictionary-in-c
 char *PS1;
 char *PATH;
 char *HOME;
+char *CWD;
 
 // Maximum command length
 const int COMMAND_BUFFER = 1023;
@@ -44,10 +46,8 @@ void unsetEnv() {
  * TODO Handle chdir error codes.
  */
 void cd(char* newPath) {
-   char* wd;
-   wd = getcwd(wd, 1023);
-   wd = strcat(wd, newPath);
-   chdir(wd);
+   CWD = strcat(CWD, newPath);
+   chdir(CWD);
 }
 
 /**
@@ -55,9 +55,7 @@ void cd(char* newPath) {
  * @author Evan
  */
 void pwd() {
-   char* wd;
-   wd = getcwd(wd, 1023);
-	printf("%s", wd);
+	printf("%s \n", CWD);
 }
 
 /**
@@ -69,6 +67,14 @@ void exitSush() {
 	exit(0);
 }
 
+/**
+ * Added mostly for debugging
+ * @author Evan
+ */
+void echo(char* message) {
+	printf("%s\n", message);
+}
+
 /**************************************
  * MAIN() AND INPUT PROCESSING FOLLOW *
  **************************************/
@@ -78,50 +84,78 @@ void exitSush() {
  * I think it's mostly just a loop of waiting for input then executing it.
  * Returns true of a command was successfully found and executed
  */
-bool readAndExecute(FILE* inputstream) {
-   // Current command to be executed.
-   char command[COMMAND_BUFFER];
-   
-   // Poll for and read input.
-	printf("%s ", PS1);
-	fgets(command, 1023, inputstream);
+bool readAndExecute(char* command) {
 	
 	if (command == NULL) return false;
 	
-	char** cmdtok = tokenize(command);
+	tokenize(command);
 	// TODO execute tokenized command.
+	
+	// ATM I can't/don't want to figure out a better way to do this.
+	if (strcmp(commandTokens[0], "exit") == 0)
+	{
+		exitSush();
+	} 
+	else if (strcmp(commandTokens[0], "pwd") == 0)
+	{
+		pwd();
+	} 
+	else if (strcmp(commandTokens[0], "cd") == 0)
+	{
+		if (commandTokens[1] == NULL)
+			cd(HOME);
+		else
+			cd(commandTokens[1]);
+	} 
+	else if (strcmp(commandTokens[0], "echo") == 0)
+	{
+		echo(commandTokens[1] == NULL ? "" : commandTokens[1]);
+	}
+	else return false;
 	
 	return true;
 }
  
 /**
- * Initializer: try to find .sushrc,
- * Execute it if able.
+ * Initializer: Set environment variables,
+ * try to find .sushrc, execute it if able.
  * Else (basically do nothing)
  */
 void init() {
 	// Set default environment variables.
 	HOME = getcwd(HOME, 1023);
 	PS1 = "$";
+	CWD = getcwd(CWD, 1023);
+	// Allocate memory for a commandToken.
+	commandTokens = malloc (1023 * sizeof(char));
+	
 	
 	FILE *sushrc;
 	// Attempt to open the .sushrc file in the open directory
-	sushrc = fopen(strcat(HOME, "/.sushrc"), "r");
-	
-	// This is an extremely ugly way to do this.
+	sushrc = fopen(strcat(HOME, "/.sushrc"), "r");	
+	// Execute commands in .sushrc
 	if (sushrc != NULL) {
-	   
 	   // Run all commands found in .sushrc
-	   int stillExecuting = true;
-	   do {
-	   	stillExecuting = readAndExecute(sushrc);
-	   } while (stillExecuting);
-		
+	   char* command = malloc(COMMAND_BUFFER * sizeof(char));
+	   while (fgets(command, COMMAND_BUFFER, sushrc));
+	   	readAndExecute(command);
+	   // free memory
+	   free(command);		
 		fclose(sushrc);
 	}
-	
 }
 
+void mainLoop() {
+	char *command = malloc(COMMAND_BUFFER * sizeof(char));
+	while (true) {
+	   // Poll for and read input.
+		printf("%s ", PS1);
+		fgets(command, COMMAND_BUFFER, stdin);
+		readAndExecute(command);
+	}
+	// This will probably never get executed but yeah
+	free(command);
+}
 
 /**
  * main
@@ -131,10 +165,6 @@ int main(int argc, char **argv) {
 	init();
 	// -- insert other initialization stuff --
 	
-	// Can move this loop to inside a mainloop if mainloop
-	// ever does anything other than process commands.
-	while (true) {
-		readAndExecute(stdin);
-	}
+	mainLoop();
 	return 0;
 }
