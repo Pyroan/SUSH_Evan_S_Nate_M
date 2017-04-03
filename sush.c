@@ -89,17 +89,18 @@ bool readAndExecute(char* command) {
 	if (command == NULL) return false;
 	
 	tokenize(command);
-	// TODO execute tokenized command.
 	
 	// ATM I can't/don't want to figure out a better way to do this.
 	if (strcmp(commandTokens[0], "exit") == 0)
 	{
 		exitSush();
 	} 
+	// Pwd
 	else if (strcmp(commandTokens[0], "pwd") == 0)
 	{
 		pwd();
 	} 
+	// Cd
 	else if (strcmp(commandTokens[0], "cd") == 0)
 	{
 		if (commandTokens[1] == NULL)
@@ -107,9 +108,15 @@ bool readAndExecute(char* command) {
 		else
 			cd(commandTokens[1]);
 	} 
+	// Echo
 	else if (strcmp(commandTokens[0], "echo") == 0)
 	{
 		echo(commandTokens[1] == NULL ? "" : commandTokens[1]);
+	}
+	// Comments starting wtih # are ignored.
+	else if (commandTokens[0][0] == '#')
+	{
+		return false;
 	}
 	else return false;
 	
@@ -147,18 +154,21 @@ void init() {
 
 void mainLoop() {
 	char *command = malloc(COMMAND_BUFFER * sizeof(char));
-	while (true) {
+	
+	// Run until we hit the EOF for stdin (aka ^D)
+	while (feof(stdin)==0) {
 	   // Poll for and read input.
 		printf("%s ", PS1);
 		fgets(command, COMMAND_BUFFER, stdin);
 		readAndExecute(command);
 	}
-	// This will probably never get executed but yeah
+	// This only gets executed on ctrl+d but hey
 	free(command);
+	printf("\n");
 }
 
 /**
- * main
+ * main -- call init and start the main loop
  */
 int main(int argc, char **argv) {
 	// Try to find and execute .sushrc

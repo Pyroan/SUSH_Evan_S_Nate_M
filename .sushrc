@@ -1,1 +1,4 @@
+# Um how does VI know to highlight this
 echo sushrc_executed_properly
+# Uncomment the following when "" works
+# echo "Sushrc REALLY Executed Properly.
