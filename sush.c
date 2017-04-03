@@ -90,6 +90,8 @@ bool readAndExecute(char* command) {
 	
 	tokenize(command);
 	
+	// Parse and Execute Commands
+	
 	// ATM I can't/don't want to figure out a better way to do this.
 	if (strcmp(commandTokens[0], "exit") == 0)
 	{
@@ -118,8 +120,12 @@ bool readAndExecute(char* command) {
 	{
 		return false;
 	}
-	else return false;
-	
+	// Unrecognized Command.
+	else
+	{
+		fprintf(stderr, "Command \"%s\" not recognized\n", commandTokens[0]);
+	 	return false;
+	}
 	return true;
 }
  
@@ -131,8 +137,8 @@ bool readAndExecute(char* command) {
 void init() {
 	// Set default environment variables.
 	HOME = getcwd(HOME, 1023);
-	PS1 = "$";
 	CWD = getcwd(CWD, 1023);
+	PS1 = "$";
 	// Allocate memory for a commandToken.
 	commandTokens = malloc (1023 * sizeof(char));
 	
@@ -156,10 +162,17 @@ void mainLoop() {
 	char *command = malloc(COMMAND_BUFFER * sizeof(char));
 	
 	// Run until we hit the EOF for stdin (aka ^D)
-	while (feof(stdin)==0) {
+	while (true) {
 	   // Poll for and read input.
 		printf("%s ", PS1);
 		fgets(command, COMMAND_BUFFER, stdin);
+		
+		// Break if we get an EOF.
+		// putting it here instead of the while statement
+		// prevents an error where the program thinks
+		// EOF is a command.
+		if (feof(stdin) !=0) break;
+				
 		readAndExecute(command);
 	}
 	// This only gets executed on ctrl+d but hey
