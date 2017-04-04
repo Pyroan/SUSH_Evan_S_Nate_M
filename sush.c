@@ -13,10 +13,24 @@
 // We may have to change these to a Dictionary data structure
 // Or some other kind of data structure. Some kind of associative array.
 // http://stackoverflow.com/questions/4384359/quick-way-to-implement-dictionary-in-c
-char *PS1;
+/*char *PS1;
 char *PATH;
 char *HOME;
-char *CWD;
+char *CWD; */
+
+typedef struct envVarlist
+{
+   envVart_t envVar;
+   envVarList_t *next;
+} envVarList_t;
+
+typedef struct envVar
+{
+   char *name;
+   char *value;
+   struct envVar *next;
+
+} envVar_t;
 
 // Maximum command length
 const int COMMAND_BUFFER = 1023;
@@ -29,7 +43,8 @@ const int COMMAND_BUFFER = 1023;
  * Create or modify the value of the environment variable var, and
  * sets its current value to value.
  */
-void setEnv() {
+void setEnv() 
+{
 
 }
 
@@ -134,8 +149,38 @@ bool readAndExecute(char* command) {
  * try to find .sushrc, execute it if able.
  * Else (basically do nothing)
  */
+struct envVar
+{
+   char *name;
+   char *value;
+   struct envVar *next;
+
+}
+/*char *PS1;
+char *PATH;
+char *HOME;
+char *CWD; */
 void init() {
 	// Set default environment variables.
+        envVar_t *PS1
+	PS1 = malloc(sizeof(struct envVar));
+	PS1 -> name = "PS1";
+	PS1 -> value = "$";
+
+	envVar_t *PATH
+	PS1 = malloc(sizeof(struct envVar));
+	PS1 -> name = "PATH";
+	PS1 -> value = HOME->;
+
+	envVar_t *PS1
+	PS1 = malloc(sizeof(struct envVar));
+	PS1 -> name = "PS1";
+	PS1 -> value = "$";
+
+	envVar_t *PS1
+	PS1 = malloc(sizeof(struct envVar));
+	PS1 -> name = "PS1";
+	PS1 -> value = "$";
 	HOME = getcwd(HOME, 1023);
 	CWD = getcwd(CWD, 1023);
 	PS1 = "$";
@@ -156,6 +201,14 @@ void init() {
 	   free(command);		
 		fclose(sushrc);
 	}
+}
+
+void createEnvVar(char *name, char *value)
+{
+   envVar_t *name;
+   *name -> name = *name;
+   *name -> value = *value;
+   envVarList_t -> next = *name;
 }
 
 void mainLoop() {
@@ -189,5 +242,6 @@ int main(int argc, char **argv) {
 	// -- insert other initialization stuff --
 	
 	mainLoop();
+	free(PS1);
 	return 0;
 }
