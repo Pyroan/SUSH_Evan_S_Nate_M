@@ -1,5 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <stdio.h> // TODO remove this when done testing
 #include "tokenizer.h"
 /**
  * Splits the passed in line into an array of
@@ -17,6 +19,9 @@
  */
 char **commandTokens;
 
+// true if everything is being concatenated as one token, false otherwise
+bool stringFlag = false;
+
 char** tokenize (char *line) {
 	// Delete trailing newline in line
 	int j = 0;
@@ -32,11 +37,69 @@ char** tokenize (char *line) {
 	// Tokenize the string.
 	int i = 0;
 	char *nextToken = strtok(line, " ");
-	while (nextToken != NULL)
+	
+  while (nextToken != NULL)
 	{
-		commandTokens[i] = nextToken;
+    if (stringFlag)
+    {
+       char temp[1023];
+       strcpy(temp, commandTokens[i-1]);
+       
+       strcat(temp, " ");
+       strcat(temp, nextToken);
+       strcpy(commandTokens[i-1], temp);
+       // Check for closing quotes.
+       stringFlag = false;
+       for (int j = 0; temp[j] != 0; j++)
+       {
+         if (temp[j] == '"')
+         {
+           stringFlag = stringFlag ? false:true;
+         }
+       }
+    } 
+    else
+    {
+      commandTokens[i] = nextToken;
+      // Check for < and > and quotes.
+      for (int j=0; commandTokens[i][j] != 0; j++)
+      {
+        // HANDLE REDIRECTION
+        if (commandTokens[i][j] == '>' || commandTokens[i][j] == '<')
+        {
+          // further split up the token.
+          char original[1023];
+          strcpy(original, nextToken);
+                  
+          char redirect = commandTokens[i][j];
+          
+          if (j != 0)
+          {  
+            // Copy up to j into the token list
+            commandTokens[i] = malloc(1023);
+            strncpy(commandTokens[i], original, j);
+            i++;
+          }
+          // Move to the next token
+          commandTokens[i] = malloc(1);
+          strncpy(commandTokens[i], &redirect, 1);
+          
+          if (original[j+1] != 0) {
+            i++;
+            commandTokens[i] = malloc(1023);
+            strcpy(commandTokens[i], &original[j+1]);
+          }
+        } 
+        // HANDLE QUOTES
+        else if (commandTokens[i][j] == '"')
+        {
+          stringFlag = stringFlag ? false:true;
+        }
+      }
+      i++;
+    }
 		nextToken = strtok(NULL, " ");
-		i++;
+		
 	}
 	
 	return commandTokens;

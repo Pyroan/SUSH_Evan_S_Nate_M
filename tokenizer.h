@@ -1,2 +1,2 @@
-extern char** commandTokens;
+extern char **commandTokens;
 char** tokenize (char*);

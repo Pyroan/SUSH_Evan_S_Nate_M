@@ -115,7 +115,7 @@ bool readAndExecute(char* command) {
 	{
 		echo(commandTokens[1] == NULL ? "" : commandTokens[1]);
 	}
-	// Comments starting wtih # are ignored.
+	// Comments starting with # are ignored.
 	else if (commandTokens[0][0] == '#')
 	{
 		return false;
@@ -139,8 +139,9 @@ void init() {
 	HOME = getcwd(HOME, 1023);
 	CWD = getcwd(CWD, 1023);
 	PS1 = "$";
-	// Allocate memory for a commandToken.
-	commandTokens = malloc (1023 * sizeof(char));
+	
+  // Allocate memory for the commandTokens.
+	commandTokens = malloc (COMMAND_BUFFER * sizeof(char));
 	
 	
 	FILE *sushrc;
@@ -163,7 +164,7 @@ void mainLoop() {
 	
 	// Run until we hit the EOF for stdin (aka ^D)
 	while (true) {
-	   // Poll for and read input.
+ 	  // Poll for and read input.
 		printf("%s ", PS1);
 		fgets(command, COMMAND_BUFFER, stdin);
 		
