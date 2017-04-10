@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include "tokenizer.h"
 
+#define TRUE 1
+#define FALSE 0
 // Environment Variables
 // We may have to change these to a Dictionary data structure
 // Or some other kind of data structure. Some kind of associative array.
@@ -29,15 +31,15 @@ const int COMMAND_BUFFER = 1023;
  * Create or modify the value of the environment variable var, and
  * sets its current value to value.
  */
-void setEnv() {
-
+void setEnv(char *name, char *value) {
+  setenv(name, value, TRUE);
 }
 
 /**
  * Delete environment variable var from the environment.
  */
-void unsetEnv() {
-
+void unsetEnv(char *name) {
+  unsetenv(name);
 }
 
 /**
@@ -46,8 +48,15 @@ void unsetEnv() {
  * TODO Handle chdir error codes.
  */
 void cd(char* newPath) {
-   CWD = strcat(CWD, newPath);
-   chdir(CWD);
+   if(newPath == "..")
+   {
+      chdir("..");
+   }
+   else
+   {
+     CWD = strcat(CWD, newPath);
+     chdir(CWD);
+    }
 }
 
 /**
