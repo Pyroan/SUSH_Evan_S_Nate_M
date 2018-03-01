@@ -1,4 +1,4 @@
-# SUSH_Schoenberger-Manning
+# SUSH_Evan_S_Nate_M
 ***sush***: A custom shell created for our CMPE-320 (Operating Systems) class.
 ## Requirements
 
