@@ -1,6 +1,6 @@
 /*****************************************
  *         SUSH: the Ship U Shell        *
- * Evan Schoenberger & Nathaniel Manning *
+ *         Evan S. & Nathaniel M.        *
  *****************************************/
 #include <stdio.h>
 #include <stdlib.h>
